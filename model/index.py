@@ -19,6 +19,10 @@ class IndexModel(DbConnect):
         soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
         tags = soup.find_all('a', href=re.compile('.'))
         list = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
         for tag in tags:
             text = tag.get_text()
             href = tag['href']
@@ -28,4 +32,7 @@ class IndexModel(DbConnect):
                     'href': href
                 }
                 list.append(link)
-        return list
+            if re.search('调剂', text):
+                res['notice'] = 1
+        res['list'] = list
+        return res
