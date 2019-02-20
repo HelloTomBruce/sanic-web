@@ -11,3 +11,13 @@ async def getList(request):
     res = IndexController.getList(request)
     return json(res)
 
+@indexBp.route('/getNotice')
+
+async def getNotice(request):
+    url = request.args['url'][0]
+    encodeType = request.args['encodeType'][0]
+    notice = IndexController.getNotice(url, encodeType)
+    res = json(notice)
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    return res
+
