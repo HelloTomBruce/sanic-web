@@ -16,7 +16,8 @@ async def getList(request):
 async def getNotice(request):
     url = request.args['url'][0]
     encodeType = request.args['encodeType'][0]
-    notice = IndexController.getNotice(url, encodeType)
+    urlType = request.args['type'][0]
+    notice = IndexController.getNotice(url, encodeType, urlType)
     res = json(notice)
     res.headers['Access-Control-Allow-Origin'] = '*'
     return res
