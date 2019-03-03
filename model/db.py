@@ -11,7 +11,7 @@ class DbConnect():
             port = 3306,
             user = 'root',
             password = 'zyw123',
-            db = 'music_demo',
+            db = 'notice',
             charset = 'utf8'
         )
         self.cursor = self.connection.cursor()

@@ -25,10 +25,12 @@ class IndexModel(DbConnect):
             'cqsf': self.getNoticdCQSF,
             'sysf': self.getNoticdSYSF,
             'mnsf': self.getNoticdMNSF,
-            'gnsf': self.getNoticdGNSF
+            'gnsf': self.getNoticdGNSF,
+            'tjsf': self.getNoticeTJSF,
+            'hbsf': self.getNoticeHBSF
         }
-        self.bot = Bot()
-        self.friend = self.bot.friends().search('拾玖')[0]
+        #self.bot = Bot()
+        #self.friend = self.bot.friends().search('拾玖')[0]
     
     def getList(self):
         self.connect()
@@ -36,6 +38,19 @@ class IndexModel(DbConnect):
         result = self.cursor.fetchall()
         self.closeConnect()
         return result
+    
+    def saveNotice(self, content):
+        self.connect()
+        self.cursor.execute('select * from notice where content="' + content + '";')
+        result = self.cursor.fetchall()
+        if len(result) == 0:
+            self.cursor.execute('insert into notice (id, content) values (null, "' + content + '");')
+            self.connection.commit()
+            self.closeConnect()
+            return True
+        else:
+            self.closeConnect()
+            return False
 
     def getNotice(self, url, encodeType, urlType):
         return self.funDict[urlType](url, encodeType)
@@ -68,7 +83,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -98,7 +115,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
 
@@ -129,7 +148,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -161,7 +182,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
 
@@ -191,7 +214,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -223,7 +248,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -252,7 +279,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -281,7 +310,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -310,7 +341,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -341,7 +374,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
 
@@ -372,7 +407,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -402,7 +439,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -432,7 +471,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -464,7 +505,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -490,7 +533,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text):
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -519,7 +564,9 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
@@ -548,9 +595,74 @@ class IndexModel(DbConnect):
                 resultList.append(link)
                 if re.search('调剂', text) and years == 2019:
                     res['notice'] = 1
-                    self.sendMsg(text, url)
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeTJSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('tr', {'height': '20'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('a')
+            text = aTag.get_text()
+            href = aTag['href']
+            publishTime = li.find('span', {'class': 'timestyle49030'}).get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y/%m/%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+
+    def getNoticeHBSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find('div', {'class': 'articles'}).find_all('li')
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('span', {'class': 'title'}).find('a')
+            text = aTag.get_text()
+            href = aTag['href']
+            publishTime = li.find('span', {'class': 'date'}).get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y-%m-%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
         res['list'] = resultList
         return res
     
     def sendMsg(self, msg, url):
-        self.friend.send(msg + '\n' + url)
+        return
+        #self.friend.send(msg + '\n' + url)
