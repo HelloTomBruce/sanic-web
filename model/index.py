@@ -27,7 +27,10 @@ class IndexModel(DbConnect):
             'mnsf': self.getNoticdMNSF,
             'gnsf': self.getNoticdGNSF,
             'tjsf': self.getNoticeTJSF,
-            'hbsf': self.getNoticeHBSF
+            'hbsf': self.getNoticeHBSF,
+            'dbsf': self.getNoticeDBSF,
+            'hdsf': self.getNoticeHDSF,
+            'shsf': self.getNoticeSHSF
         }
         #self.bot = Bot()
         #self.friend = self.bot.friends().search('拾玖')[0]
@@ -40,17 +43,18 @@ class IndexModel(DbConnect):
         return result
     
     def saveNotice(self, content):
-        self.connect()
-        self.cursor.execute('select * from notice where content="' + content + '";')
-        result = self.cursor.fetchall()
-        if len(result) == 0:
-            self.cursor.execute('insert into notice (id, content) values (null, "' + content + '");')
-            self.connection.commit()
-            self.closeConnect()
-            return True
-        else:
-            self.closeConnect()
-            return False
+        return True
+        # self.connect()
+        # self.cursor.execute('select * from notice where content="' + content + '";')
+        # result = self.cursor.fetchall()
+        # if len(result) == 0:
+        #     self.cursor.execute('insert into notice (id, content) values (null, "' + content + '");')
+        #     self.connection.commit()
+        #     self.closeConnect()
+        #     return True
+        # else:
+        #     self.closeConnect()
+        #    return False
 
     def getNotice(self, url, encodeType, urlType):
         return self.funDict[urlType](url, encodeType)
@@ -646,6 +650,92 @@ class IndexModel(DbConnect):
             text = aTag.get_text()
             href = aTag['href']
             publishTime = li.find('span', {'class': 'date'}).get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y-%m-%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeDBSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find('ul', {'class': 'list'}).find_all('li')
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('div', {'class': 'list_wen fr'}).find('a')
+            text = aTag.get_text()
+            href = aTag['href']
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': ''
+                }
+                resultList.append(link)
+                if re.search('调剂', text):
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeHDSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find('div', {'class': 'lightgreybox'}).find_all('ul')
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('a')
+            text = aTag.get_text()
+            href = aTag['href']
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': ''
+                }
+                resultList.append(link)
+                if re.search('调剂', text):
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeSHSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('a', {'class': 'Normal'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            text = li.get_text()
+            href = li['href']
+            publishTime = li.find_parent().find_next_sibling().find('span', {'class': 'PublishDate'}).get_text().strip()
             timeTu = time.strptime(publishTime, '%Y-%m-%d')
             years = int(timeTu[0])
             if re.search('研究生|硕士|调剂', text) and len(text) > 5:
