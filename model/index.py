@@ -30,10 +30,18 @@ class IndexModel(DbConnect):
             'hbsf': self.getNoticeHBSF,
             'dbsf': self.getNoticeDBSF,
             'hdsf': self.getNoticeHDSF,
-            'shsf': self.getNoticeSHSF
+            'shsf': self.getNoticeSHSF,
+            'bhdx': self.getNoticeBHDX,
+            'qqhe': self.getNoticeQQHE,
+            'jms': self.getNoticeJMS,
+            'aqsf': self.getNoticeAQSF,
+            'dhlg': self.getNoticeDHLG,
+            'qfsf': self.getNoticeQFSF,
+            'lddx': self.getNoticeLDDX,
+            'hnlg': self.getNoticeHNLG
         }
-        #self.bot = Bot()
-        #self.friend = self.bot.friends().search('拾玖')[0]
+        self.bot = Bot()
+        self.friend = self.bot.friends().search('拾玖')[0]
     
     def getList(self):
         self.connect()
@@ -43,18 +51,17 @@ class IndexModel(DbConnect):
         return result
     
     def saveNotice(self, content):
-        return True
-        # self.connect()
-        # self.cursor.execute('select * from notice where content="' + content + '";')
-        # result = self.cursor.fetchall()
-        # if len(result) == 0:
-        #     self.cursor.execute('insert into notice (id, content) values (null, "' + content + '");')
-        #     self.connection.commit()
-        #     self.closeConnect()
-        #     return True
-        # else:
-        #     self.closeConnect()
-        #    return False
+        self.connect()
+        self.cursor.execute('select * from notice where content="' + content + '";')
+        result = self.cursor.fetchall()
+        if len(result) == 0:
+            self.cursor.execute('insert into notice (id, content) values (null, "' + content + '");')
+            self.connection.commit()
+            self.closeConnect()
+            return True
+        else:
+            self.closeConnect()
+            return False
 
     def getNotice(self, url, encodeType, urlType):
         return self.funDict[urlType](url, encodeType)
@@ -753,6 +760,256 @@ class IndexModel(DbConnect):
         res['list'] = resultList
         return res
     
+    def getNoticeBHDX(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('a', {'class': 'c161672'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            text = li.get_text()
+            href = li['href']
+            publishTime = li.find_parent().find_next_sibling().find('span', {'class': 'timestyle161672'}).get_text().strip()[1:-1]
+            timeTu = time.strptime(publishTime, '%Y-%m-%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeQQHE(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('a', {'class': 'c127363'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            text = li.get_text()
+            href = li['href']
+            publishTime = li.find_parent().find_next_sibling().find('span', {'class': 'timestyle127363'}).get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y/%m/%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeJMS(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('a', {'class': 'c18280'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            text = li.get_text()
+            href = li['href']
+            publishTime = li.find_parent().find_next_sibling().get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y/%m/%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeAQSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('td', {'width': '78%'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('a')
+            text = aTag.get_text()
+            href = aTag['href']
+            publishTime = li.find_next_sibling().get_text().strip()
+            timeTu = time.strptime(publishTime, '%Y-%m-%d')
+            years = int(timeTu[0])
+            if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                link = {
+                    'text': text,
+                    'href': href,
+                    'time': publishTime
+                }
+                resultList.append(link)
+                if re.search('调剂', text) and years == 2019:
+                    res['notice'] = 1
+                    result = self.saveNotice(text + url)
+                    if result:
+                        self.sendMsg(text, url)
+        res['list'] = resultList
+        return res
+    
+    def getNoticeDHLG(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('tr', {'class': 'firstRow'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('a')
+            try:
+                text = aTag.get_text()
+                href = aTag['href']
+                if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                    link = {
+                        'text': text,
+                        'href': href,
+                        'time': ''
+                    }
+                    resultList.append(link)
+                    if re.search('调剂', text):
+                        res['notice'] = 1
+                        result = self.saveNotice(text + url)
+                        if result:
+                            self.sendMsg(text, url)
+            except Exception as e:
+                print(e)
+                continue
+        res['list'] = resultList
+        return res
+    
+    def getNoticeQFSF(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find('ul', {'class': 'news_lists'}).find_all('li')
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            aTag = li.find('a')
+            try:
+                text = aTag.get_text()
+                href = aTag['href']
+                publishTime = li.find('span', {'class': 'list_time'}).get_text().strip()
+                timeTu = time.strptime(publishTime, '%Y-%m-%d')
+                years = int(timeTu[0])
+                if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                    link = {
+                        'text': text,
+                        'href': href,
+                        'time': publishTime
+                    }
+                    resultList.append(link)
+                    if re.search('调剂', text) and years == 2019:
+                        res['notice'] = 1
+                        result = self.saveNotice(text + url)
+                        if result:
+                            self.sendMsg(text, url)
+            except Exception as e:
+                print(e)
+                continue
+        res['list'] = resultList
+        return res
+    
+    def getNoticeLDDX(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('a', {'class': 'MainContentB'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            try:
+                text = li.get_text()
+                href = li['href']
+                if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                    link = {
+                        'text': text,
+                        'href': href,
+                        'time': ''
+                    }
+                    resultList.append(link)
+                    if re.search('调剂', text):
+                        res['notice'] = 1
+                        result = self.saveNotice(text + url)
+                        if result:
+                            self.sendMsg(text, url)
+            except Exception as e:
+                print(e)
+                continue
+        res['list'] = resultList
+        return res
+    
+    def getNoticeHNLG(self, url, encodeType):
+        html = requests.get(url).content
+        soup = BeautifulSoup(html, 'html5lib', from_encoding = encodeType)
+        liList = soup.find_all('li', {'class': 'li_dash'})
+        resultList = []
+        res = {
+            'notice': 0,
+            'list': []
+        }
+        for li in liList:
+            try:
+                aTag = li.find('a')
+                text = aTag.get_text()
+                href = aTag['href']
+                if re.search('研究生|硕士|调剂', text) and len(text) > 5:
+                    link = {
+                        'text': text,
+                        'href': href,
+                        'time': ''
+                    }
+                    resultList.append(link)
+                    if re.search('调剂', text):
+                        res['notice'] = 1
+                        result = self.saveNotice(text + url)
+                        if result:
+                            self.sendMsg(text, url)
+            except Exception as e:
+                print(e)
+                continue
+        res['list'] = resultList
+        return res
+
     def sendMsg(self, msg, url):
-        return
-        #self.friend.send(msg + '\n' + url)
+        self.friend.send(msg + '\n' + url)
